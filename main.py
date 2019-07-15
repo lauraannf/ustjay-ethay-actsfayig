@@ -17,9 +17,17 @@ def get_fact():
     return facts[0].getText()
 
 
+def pig_fact(fact):
+    payload = {'input_text': fact}
+    response = requests.get("http://hidden-journey-62459.herokuapp.com",
+                            headers=payload, allow_redirects=False)
+    return response.content
+    
 @app.route('/')
 def home():
-    return "FILL ME!"
+    fact = get_fact().strip()
+    body = pig_fact(fact)
+    return Response(response=body)
 
 
 if __name__ == "__main__":

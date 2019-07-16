@@ -1,3 +1,4 @@
+""" mashup gets fact and pig latinizes it"""
 import os
 
 import requests
@@ -8,6 +9,7 @@ app = Flask(__name__)
 
 
 def get_fact():
+    """gets the random fact"""
 
     response = requests.get("http://unkno.com")
 
@@ -18,19 +20,19 @@ def get_fact():
 
 
 def pig_fact(fact):
-    payload = {'input_text': fact}
-    response = requests.get("http://hidden-journey-62459.herokuapp.com",
-                            headers=payload, allow_redirects=False)
-    return response.content
-    
+    """turns the fact into pig latin"""
+    data = {'input_text': fact}
+    response = requests.post("https://hidden-journey-62459.herokuapp.com/piglatinize/",
+                             data=data, allow_redirects=False)  # it's a 302, post, redirect
+    return response.headers['location']  # url we want is in header
+
 @app.route('/')
 def home():
     fact = get_fact().strip()
-    body = pig_fact(fact)
+    body = '<a href="{}">{}</a>'.format(pig_fact(fact), pig_fact(fact)) # link
     return Response(response=body)
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 6787))
     app.run(host='0.0.0.0', port=port)
-
